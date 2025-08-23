@@ -1,0 +1,25 @@
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """
+    Application settings loaded from environment variables and .env files.
+
+    This class defines the configuration settings for the application, including log settings,
+    server configuration, API version, Weaviate database settings, and OpenAI credentials.
+    """
+    model_config = SettingsConfigDict(env_file=[".env", "./.env", "../.env"])
+
+    # ENV
+    ENV: str = Field(...)
+
+    # Server configuration
+    SERVER_HOST: str = Field(default="localhost")
+    SERVER_PORT: int = Field(default=8000)
+
+    # Logging
+    LOG_LEVEL: str = Field(default="INFO")
+
+
+settings = Settings()
