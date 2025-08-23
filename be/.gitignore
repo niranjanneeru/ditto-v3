@@ -1,0 +1,82 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Python env
+.venv/
+venv/
+
+# macOS
+.DS_Store
+
+# IDE
+*.pyc
+*.pyo
+*.psd
+*.swp
+*.swo
+
+# PyCharm
+__pycache__/
+*.egg-info/
+.idea/
+
+# VSCode
+.vscode/
+
+# Cython
+*.so
+*.c
+*.cpp
+*.h
+
+# Build
+build/
+dist/
+
+# Django
+*.log
+*.pot
+*.po
+local_settings.py
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile
+Pipfile.lock
+
+# poetry
+.venv/
+
+# mypy
+.mypy_cache/
+
+# pytest
+.pytest_cache/
+
+# AWS
+.aws/
+
+# fastapi
+.databases/
+.env
+.env.example
