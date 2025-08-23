@@ -80,3 +80,6 @@ Pipfile.lock
 .databases/
 .env
 .env.example
+
+alembic/
+alembic.ini
