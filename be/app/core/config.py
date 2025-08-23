@@ -21,5 +21,7 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = Field(default="INFO")
 
+    LIX_API_KEY: str = Field(...)
+
 
 settings = Settings()
