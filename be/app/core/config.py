@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     Application settings loaded from environment variables and .env files.
 
     This class defines the configuration settings for the application, including log settings,
-    server configuration, API version, Weaviate database settings, and OpenAI credentials.
+    server configuration, API version, Supabase database settings, and API credentials.
     """
     model_config = SettingsConfigDict(env_file=[".env", "./.env", "../.env"])
 
@@ -22,7 +22,10 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = Field(default="INFO")
 
+    # API Keys
     LIX_API_KEY: str = Field(...)
+
+    DATABASE_URL: str = Field(..., description="Full database connection URL")
 
     # Livekit
     LIVEKIT_API_KEY: str = Field(...)
