@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     # ENV
     ENV: str = Field(...)
+    API_V1_STR: str = Field(default="/api/v1")
 
     # Server configuration
     SERVER_HOST: str = Field(default="localhost")
@@ -22,6 +23,17 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO")
 
     LIX_API_KEY: str = Field(...)
+
+    # Livekit
+    LIVEKIT_API_KEY: str = Field(...)
+    LIVEKIT_API_SECRET: str = Field(...)
+    LIVEKIT_URL: str = Field(...)
+
+    # Deepgram
+    DEEPGRAM_API_KEY: str = Field(...)
+
+    # OpenAI
+    OPENAI_API_KEY: str = Field(...)
 
 
 settings = Settings()
