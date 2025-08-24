@@ -42,12 +42,6 @@ export const Home: React.FC = () => {
   }, []);
 
   const handleStartSession = async () => {
-    const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-
-    if (!accessToken) {
-      setOpenLoginPopup(true);
-      return;
-    }
     
     setIsCreatingRoom(true);
     try {
