@@ -31,42 +31,42 @@ class LinkedInToolRegistry:
         """Register all available tools."""
         tools = {
             # Account tools
-            "get_account_balances": get_account_balances,
-            "get_daily_allowance": get_daily_allowance,
+            # "get_account_balances": get_account_balances,
+            # "get_daily_allowance": get_daily_allowance,
             
             # Person tools
-            "enrich_person": enrich_person,
-            "enrich_person_extended": enrich_person_extended,
-            "get_person_ids": get_person_ids,
+            # "enrich_person": enrich_person,
+            # "enrich_person_extended": enrich_person_extended,
+            # "get_person_ids": get_person_ids,
             
             # Company tools
-            "enrich_organization": enrich_organization,
-            "get_company_followers": get_company_followers,
-            "get_organisation_ids": get_organisation_ids,
+            # "enrich_organization": enrich_organization,
+            # "get_company_followers": get_company_followers,
+            # "get_organisation_ids": get_organisation_ids,
             
             # Search tools
             "search_people": search_people,
-            "search_jobs": search_jobs,
-            "search_companies": search_companies,
-            "search_posts": search_posts,
-            "search_sales_navigator_leads": search_sales_navigator_leads,
-            "search_sales_navigator_accounts": search_sales_navigator_accounts,
-            "search_recruiter_candidates": search_recruiter_candidates,
+            # "search_jobs": search_jobs,
+            # "search_companies": search_companies,
+            # "search_posts": search_posts,
+            # "search_sales_navigator_leads": search_sales_navigator_leads,
+            # "search_sales_navigator_accounts": search_sales_navigator_accounts,
+            # "search_recruiter_candidates": search_recruiter_candidates,
             
             # Post & Activity tools
-            "enrich_post": enrich_post,
-            "get_post_comments": get_post_comments,
-            "get_post_reactions": get_post_reactions,
-            "get_user_posts": get_user_posts,
-            "get_user_comments": get_user_comments,
+            # "enrich_post": enrich_post,
+            # "get_post_comments": get_post_comments,
+            # "get_post_reactions": get_post_reactions,
+            # "get_user_posts": get_user_posts,
+            # "get_user_comments": get_user_comments,
             
             # Contact tools
             "get_email_from_profile": get_email_from_profile,
-            "lookup_person_by_email": lookup_person_by_email,
+            # "lookup_person_by_email": lookup_person_by_email,
             
             # Job tools
-            "enrich_job_posting": enrich_job_posting,
-            "get_job_posting_hirers": get_job_posting_hirers,
+            # "enrich_job_posting": enrich_job_posting,
+            # "get_job_posting_hirers": get_job_posting_hirers,
         }
         
         return tools
