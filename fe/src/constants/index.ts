@@ -6,6 +6,7 @@ const APP_ROUTES = {
   VOICE_ASSISTANT: "/voice-assistant",
   HEALTH: "/health",
   CALL_SUMMARY: "/call-summary",
+  IMPORT_LEADS: "/import-leads",
 } as const;
 
 const API_ROUTES = {

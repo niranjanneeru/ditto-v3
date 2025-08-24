@@ -2,7 +2,7 @@ import React from "react";
 import { createBrowserRouter, RouterProvider, useRouteError, Navigate } from "react-router-dom";
 
 import { ErrorBoundary } from "@components";
-import { Home, VoiceAssistant, Health, CallSummary } from "@pages";
+import { Home, VoiceAssistant, Health, CallSummary, ImportLeads } from "@pages";
 import { APP_ROUTES } from "@constants";
 
 
@@ -36,6 +36,11 @@ const router = createBrowserRouter([
     element: (
         <CallSummary />
     ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: APP_ROUTES.IMPORT_LEADS,
+    element: <ImportLeads />,
     errorElement: <RouteErrorBoundary />,
   },
   {
