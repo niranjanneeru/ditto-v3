@@ -10,7 +10,8 @@ from openpyxl import load_workbook
 
 from app.db.database import get_db_session
 from app.db.models import Lead
-from app.schemas.leads import LeadBulkInsertResponse
+from app.schemas.leads import SMS, LeadBulkInsertResponse
+
 
 router = APIRouter()
 
@@ -108,3 +109,115 @@ async def bulk_insert_leads(
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to process file: {e}")
+
+
+@router.post("/sms", status_code=status.HTTP_200_OK)
+async def sms(
+    sms: SMS,
+    db: AsyncSession = Depends(get_db_session),
+):
+    """Send personalized SMS to all leads using SirenAgentToolkit."""
+    try:
+        from sqlalchemy import select
+        result = await db.execute(
+            select(Lead.name, Lead.mobile).where(Lead.mobile.isnot(None))
+        )
+        leads = result.fetchall()
+        
+        if not leads:
+            raise HTTPException(status_code=404, detail="No leads with mobile numbers found")
+        
+        from app.core.config import settings
+        from langchain_openai import ChatOpenAI
+        from langchain.agents import AgentExecutor, create_tool_calling_agent
+        from langchain_core.prompts import ChatPromptTemplate
+        from agenttoolkit.langchain import SirenAgentToolkit
+        
+        llm = ChatOpenAI(
+            model="gpt-4o-mini",
+            temperature=0.7,
+            api_key=settings.OPENAI_API_KEY
+        )
+        
+        siren_toolkit = SirenAgentToolkit(
+            api_key=settings.SIREN_API_KEY,
+            configuration={
+                "actions": {
+                    "messaging": {
+                        "create": True,
+                        "read": True,
+                    },
+                    "templates": {
+                        "read": True,
+                        "create": True,
+                    }
+                },
+            },
+        )
+        
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are a helpful assistant that can send SMS messages using Siren. 
+            
+            IMPORTANT: For SMS channel, always provide:
+            - channel: "SMS"
+            - recipient_value: the mobile number (e.g., "+919188065817")
+            - body: the message content
+            
+            When sending messages, personalize them with the recipient's name and make them conversational and friendly. Keep SMS messages under 160 characters when possible."""),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ])
+        
+        tools = siren_toolkit.get_tools()
+        
+        
+        agent = create_tool_calling_agent(llm, tools, prompt)
+        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+        
+        sent_count = 0
+        failed_count = 0
+        results = []
+        
+        for name, mobile in leads:
+            try:
+                agent_input = f"""
+                Send a message using the following details:
+                - Channel: SMS
+                - Recipient mobile number: {mobile}
+                - Message content: Personalize this for "{name}": {sms.content}
+                
+                Make the message personal by adding their name naturally and keep it conversational and friendly.
+                Ensure you provide the recipient mobile number in the correct field for SMS channel.
+                """
+                
+                result = agent_executor.invoke({"input": agent_input})
+                
+                sent_count += 1
+                results.append({
+                    "name": name,
+                    "mobile": mobile, 
+                    "status": "sent",
+                    "agent_response": result.get("output", "Message sent successfully")
+                })
+                    
+            except Exception as e:
+                failed_count += 1
+                results.append({
+                    "name": name,
+                    "mobile": mobile,
+                    "status": "failed", 
+                    "error": str(e)
+                })
+        
+        return {
+            "total_leads": len(leads),
+            "sent_count": sent_count,
+            "failed_count": failed_count,
+            "results": results,
+            "message": f"SMS broadcast completed: {sent_count} sent, {failed_count} failed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"SMS broadcast failed: {str(e)}")

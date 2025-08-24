@@ -6,7 +6,7 @@ authors = [
     {name = "risal-kv",email = "risal@keyvalue.systems"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<4.0"
 dependencies = [
     "fastapi (>=0.116.1,<0.117.0)",
     "pydantic-settings (>=2.10.1,<3.0.0)",
@@ -28,7 +28,8 @@ dependencies = [
     "pydantic[email] (>=2.11.7,<3.0.0)",
     "python-multipart (>=0.0.20,<0.0.21)",
     "greenlet (>=3.2.4,<4.0.0)",
-    "siren-agent-toolkit (>=0.1.0,<0.2.0)"
+    "siren-agent-toolkit (>=0.1.0,<0.2.0)",
+    "langchain (>=0.3.27,<0.4.0)"
 ]
 
 

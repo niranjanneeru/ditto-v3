@@ -51,12 +51,12 @@ def create_cold_outreach_graph(room):
         - Provide personalized outreach advice and strategies
         - Analyze prospect information for effective messaging
         - Suggest conversation starters and follow-up approaches
+        - If you already have the email to send dont use tools to find it again
         
         You have access to LinkedIn tools for:
         - Searching for people and companies
         - Getting detailed profile information
         - Finding contact information
-        - Analyzing posts and activities
         - Finding email if you have linkedin profile url
 
         You have access to Siren Tools to send email
@@ -188,7 +188,7 @@ def create_cold_outreach_graph(room):
         logger.info(f"⏸️ CONFIRM EMAIL NODE: Showing email preview to user (To: {recipient_email})")
         return {"messages": [confirmation_message]}
     
-    def send_email_node(state: GraphState) -> GraphState:
+    async def send_email_node(state: GraphState) -> GraphState:
         """Send the drafted email using LLM extraction."""
         logger.info("📤 SEND EMAIL NODE: Starting email sending process")
         messages = state["messages"]
@@ -296,6 +296,14 @@ def create_cold_outreach_graph(room):
                 body=body
             )
             logger.info(f"✅ SEND EMAIL NODE: Siren API responded successfully: {siren_response}")
+
+            await send_sim_event(
+                room,
+                {"type": "EMAIL_EVENT", "phase": "Complete", "room": room.name},
+                topic="sim:email",
+                identities=None,
+                reliable=True,
+            )
             
             # Success confirmation
             confirmation_message = HumanMessage(content=f"""
@@ -358,6 +366,8 @@ def create_cold_outreach_graph(room):
                 3. If user asks questions about prospects, LinkedIn data, or research → "tools"
                 4. In ALL OTHER cases (greetings, thanks, unclear requests, etc.) → "end"
                 5. If user asks to send an email → "send_email"
+                6. If user specify an email id and ask to draft procced with "draft_email" don't use "tools"
+                7. If user specify an email id and ask to send email procced with "send_email" don't use "tools"
                 
                 Respond with EXACTLY ONE word:
                 - "draft_email" - only if explicitly requesting email creation

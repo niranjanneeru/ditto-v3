@@ -16,3 +16,7 @@ class LeadBulkInsertResponse(BaseModel):
     duplicate_count: int
     failed_count: int
     errors: List[str] = []
+
+
+class SMS(BaseModel):
+    content: str = Field(..., description="Content of the SMS")
