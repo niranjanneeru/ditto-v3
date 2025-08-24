@@ -38,5 +38,8 @@ class Settings(BaseSettings):
     # OpenAI
     OPENAI_API_KEY: str = Field(...)
 
+    # Siren
+    SIREN_API_KEY: str = Field(...)
+
 
 settings = Settings()

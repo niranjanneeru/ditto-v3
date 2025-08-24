@@ -20,6 +20,7 @@ interface ControlButtonProps {
   label: string;
   ariaLabel: string;
   hoverColor?: "red" | "blue" | "gray";
+  isGoogleMeetStyle?: boolean;
 }
 interface AppConfig {
   apiUrl: string;

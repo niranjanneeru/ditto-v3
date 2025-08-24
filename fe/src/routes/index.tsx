@@ -2,9 +2,9 @@ import React from "react";
 import { createBrowserRouter, RouterProvider, useRouteError, Navigate } from "react-router-dom";
 
 import { ErrorBoundary } from "@components";
-import { Home, VoiceAssistant, Health, CallSummary } from "@pages";
+import { Home, VoiceAssistant, Health, CallSummary, ImportLeads } from "@pages";
 import { APP_ROUTES } from "@constants";
-import { PrivateRoute } from "./PrivateRoute";
+
 
 const RouteErrorBoundary: React.FC = () => {
   const error = useRouteError();
@@ -27,19 +27,20 @@ const router = createBrowserRouter([
   {
     path: `${APP_ROUTES.VOICE_ASSISTANT}/:roomId?`,
     element: (
-      <PrivateRoute>
         <VoiceAssistant />
-      </PrivateRoute>
     ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: APP_ROUTES.CALL_SUMMARY,
     element: (
-      <PrivateRoute>
         <CallSummary />
-      </PrivateRoute>
     ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: APP_ROUTES.IMPORT_LEADS,
+    element: <ImportLeads />,
     errorElement: <RouteErrorBoundary />,
   },
   {

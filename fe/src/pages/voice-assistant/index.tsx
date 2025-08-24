@@ -5,7 +5,7 @@ import { Header, SimulationLoader } from "@components";
 import { useVoiceAssistant } from "@hooks";
 import { Timer } from "./components/Timer";
 import { CustomControlBar } from "./components/CustomControlBar";
-import { AudioWaveAnimation } from "./components/AudioWaveAnimation";
+import { HorizontalWaveVisualizer } from "./components/HorizontalWaveVisualizer";
 import { WarningPopup } from "./components/WarningPopup";
 import { ErrorPopup } from "./components/ErrorPopup";
 
@@ -30,10 +30,14 @@ export const VoiceAssistant = () => {
 
     return (
       <div className="absolute sm:top-0 top-[10px] left-0 right-0 text-center mb-4">
-        <div className="text-[#1A1A1A] text-xl sm:mb-[20px] mb-[10px]">
-          Session in <span className="italic font-[500]">progress</span>
+        <div className="text-gray-900 text-xl sm:mb-[20px] mb-[10px]">
+          Our agent is listening...
         </div>
-        <Timer startTime={startTime} onTimeLimit={handleTimeLimit} onWarning={handleWarning} />
+        <Timer
+          startTime={startTime}
+          onTimeLimit={handleTimeLimit}
+          onWarning={handleWarning}
+        />
       </div>
     );
   };
@@ -48,7 +52,9 @@ export const VoiceAssistant = () => {
         <>
           {renderSessionStatus()}
           <RoomAudioRenderer />
-          <AudioWaveAnimation />
+          <div className="flex flex-col items-center justify-center gap-8 w-full">
+            <HorizontalWaveVisualizer />
+          </div>
           <CustomControlBar onEndSession={handleEndSession} />
         </>
       );
@@ -60,7 +66,7 @@ export const VoiceAssistant = () => {
   return (
     <RoomContext.Provider value={room}>
       <Header disableIconClick={true} isShowProfile={false} />
-      <div className="h-full min-h-[82vh] bg-white flex flex-col items-center justify-center relative font-['IBM_Plex_Serif']">
+      <div className="h-full min-h-[82vh] flex flex-col items-center justify-center relative font-['IBM_Plex_Serif']">
         {renderContent()}
         <WarningPopup isOpen={showWarning} onClose={handleCloseWarning} />
         <ErrorPopup

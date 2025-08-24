@@ -8,6 +8,7 @@ export const ControlButton: React.FC<ControlButtonProps> = ({
   label,
   ariaLabel,
   hoverColor = "gray",
+  isGoogleMeetStyle = false,
 }) => {
   const getHoverColorClass = () => {
     switch (hoverColor) {
@@ -20,14 +21,22 @@ export const ControlButton: React.FC<ControlButtonProps> = ({
     }
   };
 
+  const getButtonClasses = () => {
+    if (isGoogleMeetStyle) {
+      return `flex items-center justify-center w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200/50 transition-all duration-200 hover:bg-gray-50 hover:shadow-xl active:scale-95 ${getHoverColorClass()}`;
+    }
+
+    return `flex items-center justify-center sm:min-w-[120px] min-w-[60px] gap-1 sm:gap-2 px-[10px] sm:px-[16px] py-[12px] sm:py-[16px] transition-colors text-[12px] sm:text-[14px] text-gray-900 ${getHoverColorClass()}`;
+  };
+
   return (
     <button
       onClick={onClick}
-      className={`flex items-center justify-center sm:min-w-[120px] min-w-[60px] gap-1 sm:gap-2 px-[10px] sm:px-[16px] py-[12px] sm:py-[16px] transition-colors text-[12px] sm:text-[14px] text-[#1A1A1A] ${getHoverColorClass()}`}
+      className={getButtonClasses()}
       aria-label={ariaLabel}
     >
-      <img src={icon} alt={label.toLowerCase()} className="w-4 h-4 sm:w-5 sm:h-5" />
-      <span className="sm:block hidden">{label}</span>
+      <img src={icon} alt={label.toLowerCase()} className="w-6 h-6" />
+      {!isGoogleMeetStyle && <span className="sm:block hidden">{label}</span>}
     </button>
   );
 };

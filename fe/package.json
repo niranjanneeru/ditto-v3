@@ -25,6 +25,7 @@
     "@emotion/styled": "^11.14.1",
     "@livekit/components-react": "^2.9.13",
     "@livekit/components-styles": "^1.1.6",
+    "@mui/x-charts": "^8.10.2",
     "framer-motion": "^12.23.3",
     "livekit-client": "^2.15.2",
     "livekit-server-sdk": "^2.13.1",
