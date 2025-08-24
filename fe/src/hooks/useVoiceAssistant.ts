@@ -20,7 +20,9 @@ export const useVoiceAssistant = (): UseVoiceAssistantReturn => {
 
   const roomDataString = localStorage.getItem(LOCAL_STORAGE_KEYS.ROOM_DATA);
   const roomData = roomDataString ? JSON.parse(roomDataString) : null;
-  const startTime = roomData?.created_at ? new Date(roomData?.created_at) : new Date();
+  const startTime = roomData?.created_at
+    ? new Date(roomData?.created_at)
+    : new Date();
 
   const clearTimer = () => {
     localStorage.removeItem(LOCAL_STORAGE_KEYS.ROOM_DATA);
@@ -67,7 +69,7 @@ export const useVoiceAssistant = (): UseVoiceAssistantReturn => {
         logger.info("Microphone enabled");
 
         // Set up audio track listeners
-        room.localParticipant.on(RoomEvent.TrackPublished, publication => {
+        room.localParticipant.on(RoomEvent.TrackPublished, (publication) => {
           try {
             if (publication.kind === Track.Kind.Audio) {
               if (!publication.track) {
@@ -82,11 +84,11 @@ export const useVoiceAssistant = (): UseVoiceAssistantReturn => {
           }
         });
 
-        room.localParticipant.on(RoomEvent.TrackSubscribed, track => {
+        room.localParticipant.on(RoomEvent.TrackSubscribed, (track) => {
           logger.debug("New track subscribed:", { kind: track.kind });
         });
 
-        room.localParticipant.on(RoomEvent.TrackUnsubscribed, track => {
+        room.localParticipant.on(RoomEvent.TrackUnsubscribed, (track) => {
           logger.debug("Track unsubscribed:", { kind: track.kind });
         });
 
@@ -100,7 +102,9 @@ export const useVoiceAssistant = (): UseVoiceAssistantReturn => {
       logger.error("Failed to connect to LiveKit room:", error);
       setIsConnecting(false);
       setIsConnected(false);
-      setError(error instanceof Error ? error.message : "Failed to connect to room");
+      setError(
+        error instanceof Error ? error.message : "Failed to connect to room",
+      );
     }
   };
 
@@ -117,7 +121,7 @@ export const useVoiceAssistant = (): UseVoiceAssistantReturn => {
     setIsConnected(false);
     setIsConnecting(false);
     room.disconnect();
-    navigate(APP_ROUTES.CALL_SUMMARY, { replace: true });
+    navigate(APP_ROUTES.HOME, { replace: true });
   };
 
   const handleTimeLimit = () => {

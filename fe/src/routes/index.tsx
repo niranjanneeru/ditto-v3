@@ -1,17 +1,23 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider, useRouteError, Navigate } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useRouteError,
+  Navigate,
+} from "react-router-dom";
 
 import { ErrorBoundary } from "@components";
-import { Home, VoiceAssistant, Health, CallSummary, ImportLeads } from "@pages";
+import { Home, VoiceAssistant, Health, ImportLeads } from "@pages";
 import { APP_ROUTES } from "@constants";
-
 
 const RouteErrorBoundary: React.FC = () => {
   const error = useRouteError();
   return (
     <ErrorBoundary>
       <div className="flex flex-col items-center justify-center h-screen w-full">
-        <h1 className="text-2xl font-bold text-red-500">Something went wrong</h1>
+        <h1 className="text-2xl font-bold text-red-500">
+          Something went wrong
+        </h1>
         <p className="text-gray-500 mt-[10px]">{String(error)}</p>
       </div>
     </ErrorBoundary>
@@ -26,16 +32,7 @@ const router = createBrowserRouter([
   },
   {
     path: `${APP_ROUTES.VOICE_ASSISTANT}/:roomId?`,
-    element: (
-        <VoiceAssistant />
-    ),
-    errorElement: <RouteErrorBoundary />,
-  },
-  {
-    path: APP_ROUTES.CALL_SUMMARY,
-    element: (
-        <CallSummary />
-    ),
+    element: <VoiceAssistant />,
     errorElement: <RouteErrorBoundary />,
   },
   {

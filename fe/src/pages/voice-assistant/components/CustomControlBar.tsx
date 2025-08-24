@@ -6,7 +6,9 @@ import type { CustomControlBarProps } from "@types";
 import { ControlButton } from "./ControlButton";
 import { EncryptionMessage } from "./EncryptionMessage";
 
-export const CustomControlBar: React.FC<CustomControlBarProps> = ({ onEndSession }) => {
+export const CustomControlBar: React.FC<CustomControlBarProps> = ({
+  onEndSession,
+}) => {
   const { isMuted, handleMuteToggle } = useVoiceControl({
     onEndSession,
   });
