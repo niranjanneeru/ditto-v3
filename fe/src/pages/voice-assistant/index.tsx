@@ -57,6 +57,8 @@ export const VoiceAssistant = () => {
     return null;
   };
 
+  console.log("voice-assistant");
+
   return (
     <RoomContext.Provider value={room}>
       <Header disableIconClick={true} isShowProfile={false} />

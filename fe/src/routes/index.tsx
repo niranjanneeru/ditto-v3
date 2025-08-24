@@ -27,18 +27,14 @@ const router = createBrowserRouter([
   {
     path: `${APP_ROUTES.VOICE_ASSISTANT}/:roomId?`,
     element: (
-      <PrivateRoute>
         <VoiceAssistant />
-      </PrivateRoute>
     ),
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: APP_ROUTES.CALL_SUMMARY,
     element: (
-      <PrivateRoute>
         <CallSummary />
-      </PrivateRoute>
     ),
     errorElement: <RouteErrorBoundary />,
   },

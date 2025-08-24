@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -6,40 +6,17 @@ import { Megaphone, Users, TrendingUp, Handshake, Phone, Mail, MessageCircle, Pl
 
 import { APP_ROUTES, LOCAL_STORAGE_KEYS } from "@constants";
 import { backRound, Close } from "@assets";
-import { Header, LoginPopup, SimulationLoader } from "@components";
+import { Header, SimulationLoader } from "@components";
 import {
   homePageContainerVariants,
   homePageItemVariants,
-  homePageExpandedVariants,
 } from "@constants";
-import type { Scenario } from "@types";
-import { createRoom, getScenarios, sendOtp, verifyOtp } from "@api";
-
-import { ScenarioCardExpanded } from "./components/ScenarioCardExpanded";
-import { TitleSection } from "./components/TitleSection";
+import { createRoom } from "@api";
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [openLoginPopup, setOpenLoginPopup] = useState(false);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
-  const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [animationKey, setAnimationKey] = useState(0);
-
-  useEffect(() => {
-    const fetchScenarios = async () => {
-      try {
-        const response = await getScenarios();
-        if (response?.data) {
-          setScenarios(response.data?.scenarios || []);
-          setAnimationKey(prev => prev + 1); // Force animation re-trigger
-        }
-      } catch (error) {
-        toast.error(`Failed to fetch scenarios ${error}`);
-      }
-    };
-    fetchScenarios();
-  }, []);
 
   const handleStartSession = async () => {
     
@@ -48,7 +25,10 @@ export const Home: React.FC = () => {
       // Create room with generated session ID
       const response = await createRoom();
 
+      console.log({response});
+
     if (response?.data) {
+      console.log("what happened??", response.data)
       localStorage.setItem(LOCAL_STORAGE_KEYS.ROOM_DATA, JSON.stringify(response.data));
       navigate(`${APP_ROUTES.VOICE_ASSISTANT}/${response?.data?.room_id}`);
     } else {
@@ -62,37 +42,9 @@ export const Home: React.FC = () => {
     }
   };
 
-  const handleLoginSuccess = () => {
-    if (selectedId) {
-      handleStartSession();
-    }
-  };
-
-  const handleLogin = async ({ email, otp }: { email: string; otp: string }) => {
-    const response = await verifyOtp({ email, otp });
-
-    if (response?.data) {
-      setOpenLoginPopup(false);
-      handleLoginSuccess();
-    } else {
-      const errorMessage = response?.error?.message || "Login failed. Please try again.";
-      toast.error(errorMessage);
-    }
-  };
-
-  const handleOtpGeneration = async (email: string) => {
-    const response = await sendOtp({ email });
-    if (!response?.data) {
-      const errorMessage = response?.error?.message || "Login failed. Please try again.";
-      toast.error(errorMessage);
-    }
-    return response;
-  };
-
   const renderDescription = () => {
     return (
       <motion.div
-        key={animationKey}
         variants={homePageItemVariants}
         initial="hidden"
         animate={selectedId ? "exit" : "visible"}
@@ -610,7 +562,6 @@ export const Home: React.FC = () => {
 
   const renderScenarioGrid = () => (
     <motion.div
-      key={animationKey}
       variants={homePageContainerVariants}
       initial="hidden"
       animate="visible"
@@ -626,28 +577,6 @@ export const Home: React.FC = () => {
       {renderPerformanceOverview()}
       {renderFooter()}
     </motion.div>
-  );
-
-  const renderExpandedScenario = () => (
-    <AnimatePresence mode="wait">
-      {selectedId && (
-        <motion.div
-          variants={homePageExpandedVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          className="bg-white sm:px-[60px] px-[10px] w-full max-w-2xl mx-auto relative"
-        >
-          {renderBackButton()}
-          <TitleSection />
-          <ScenarioCardExpanded
-            scenario={scenarios?.find((s: Scenario) => s.unique_id === selectedId)}
-            onClose={() => setSelectedId(null)}
-            onStart={() => handleStartSession()}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 
   const renderLoading = () => {
@@ -712,17 +641,26 @@ export const Home: React.FC = () => {
         <div className="flex flex-col h-full p-[10px] sm:p-[24px] justify-start items-center pt-8 w-[80%]">
           {renderDescription()}
           <AnimatePresence mode="wait">
-            {selectedId ? renderExpandedScenario() : renderScenarioGrid()}
+          <motion.div
+      variants={homePageContainerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className={`relative ${selectedId ? "hidden" : ""} w-full`}
+    >
+      {renderCreateRoomButton()}
+      {renderKPIs()}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+        {renderRecentCampaigns()}
+        {renderQuickActions()}
+        </div>
+      {renderPerformanceOverview()}
+      {renderFooter()}
+    </motion.div>
           </AnimatePresence>
         </div>
         {isCreatingRoom && renderLoading()}
       </div>
-      <LoginPopup
-        isOpen={openLoginPopup}
-        onSubmit={handleLogin}
-        onSendOtpTrigger={handleOtpGeneration}
-        onClose={() => setOpenLoginPopup(false)}
-      />
     </div>
   );
 };
