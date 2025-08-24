@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider, useRouteError, Navigate } from "re
 import { ErrorBoundary } from "@components";
 import { Home, VoiceAssistant, Health, CallSummary } from "@pages";
 import { APP_ROUTES } from "@constants";
-import { PrivateRoute } from "./PrivateRoute";
+
 
 const RouteErrorBoundary: React.FC = () => {
   const error = useRouteError();

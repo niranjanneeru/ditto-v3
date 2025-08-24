@@ -58,13 +58,13 @@ export const Timer: React.FC<TimerProps> = ({
   }, [startTime, checkWarningState, checkTimeLimit, calculateTimeRemaining]);
 
   const renderLoader = () => (
-    <div className="w-[30px] h-[30px] mt-[10px] border-t-2 border-b-2 border-[#9CA3AF] rounded-full animate-spin" />
+    <div className="w-[30px] h-[30px] mt-[10px] border-t-2 border-b-2 border-gray-400 rounded-full animate-spin" />
   );
 
   return (
     <div
       className={`flex min-w-[100px] items-center justify-center sm:text-[36px] text-[28px] font-[500] h-[40px] ${
-        isWarning ? "text-red-500" : "text-[#9CA3AF]"
+        isWarning ? "text-red-600" : "text-gray-600"
       }`}
     >
       {elapsed || renderLoader()}

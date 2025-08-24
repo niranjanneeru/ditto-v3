@@ -12,11 +12,11 @@ const CIRCLE = {
   MIN_SCALE: 1,
   BORDER: {
     WIDTH: 0.5,
-    COLOR: "rgba(45, 115, 186, 0.3)",
+    COLOR: "rgba(75, 85, 99, 0.3)",
   },
   GRADIENT: {
-    START_COLOR: "45, 115, 186", // RGB for #2D73BA
-    END_COLOR: "231, 244, 255", // RGB for #E7F4FF
+    START_COLOR: "75, 85, 99", // RGB for #4B5563 (gray-600)
+    END_COLOR: "243, 244, 246", // RGB for #F3F4F6 (gray-100)
     ANGLE: 180,
   },
 } as const;

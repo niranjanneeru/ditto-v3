@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Megaphone, Users, TrendingUp, Handshake, Phone, Mail, MessageCircle, Plus, Upload, Bot, BarChart3, Mic } from "lucide-react";
 
 import { APP_ROUTES, LOCAL_STORAGE_KEYS } from "@constants";
-import { backRound, Close } from "@assets";
 import { Header, SimulationLoader } from "@components";
 import {
   homePageContainerVariants,
@@ -15,7 +14,6 @@ import { createRoom } from "@api";
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
 
   const handleStartSession = async () => {
@@ -47,8 +45,8 @@ export const Home: React.FC = () => {
       <motion.div
         variants={homePageItemVariants}
         initial="hidden"
-        animate={selectedId ? "exit" : "visible"}
-        className={`flex px-[10px] sm:px-[0px] flex-row items-center justify-center w-full text-[#1A1A1A] sm:text-[32px] text-[24px] font-[700] sm:mb-[66px] mb-[30px] sm:leading-[40px] leading-[28px] ${selectedId && "h-[0px]"}`}
+        animate={"visible"}
+        className={`flex px-[10px] sm:px-[0px] flex-row items-center justify-center w-full text-[#1A1A1A] sm:text-[32px] text-[24px] font-[700] sm:mb-[66px] mb-[30px] sm:leading-[40px] leading-[28px]`}
       >
         <div className="text-center relative">
           <motion.div
@@ -118,7 +116,7 @@ export const Home: React.FC = () => {
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             />
           )}
-        </motion.button>
+      </motion.button>
       </motion.div>
     );
   };
@@ -174,7 +172,7 @@ export const Home: React.FC = () => {
               >
                 <kpi.icon size={28} />
               </motion.div>
-            </div>
+    </div>
             
             <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${kpi.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300`}></div>
           </motion.div>
@@ -191,7 +189,7 @@ export const Home: React.FC = () => {
     ];
 
     return (
-      <motion.div 
+    <motion.div
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, delay: 1.6 }}
@@ -209,7 +207,7 @@ export const Home: React.FC = () => {
         </div>
         <div className="space-y-4">
           {campaigns.map((campaign, index) => (
-            <motion.div 
+            <motion.div
               key={index} 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -306,8 +304,8 @@ export const Home: React.FC = () => {
             </motion.button>
           ))}
         </div>
-      </motion.div>
-    );
+    </motion.div>
+  );
   };
 
   const renderPerformanceOverview = () => {
@@ -331,7 +329,7 @@ export const Home: React.FC = () => {
             <div className="w-3 h-3 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </motion.div>
         </div>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 2.6 }}
@@ -543,41 +541,9 @@ export const Home: React.FC = () => {
     );
   };
 
-  const renderBackButton = () => {
-    return (
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
-        onClick={() => setSelectedId(null)}
-        className="absolute top-[5px] sm:top-[90px] left-[calc(100%-30px)] sm:left-[0px] hover:scale-105 transition-transform"
-        aria-label="Close scenario details"
-      >
-        <img src={backRound} alt="back" className="w-[40px] h-[40px] sm:block hidden" />
-        <img src={Close} alt="back" className="w-[26px] h-[40px] sm:hidden block" />
-      </motion.button>
-    );
-  };
 
-  const renderScenarioGrid = () => (
-    <motion.div
-      variants={homePageContainerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      className={`relative ${selectedId ? "hidden" : ""} w-full`}
-    >
-      {renderCreateRoomButton()}
-      {renderKPIs()}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-        {renderRecentCampaigns()}
-        {renderQuickActions()}
-        </div>
-      {renderPerformanceOverview()}
-      {renderFooter()}
-    </motion.div>
-  );
+
+
 
   const renderLoading = () => {
     return (
@@ -646,7 +612,7 @@ export const Home: React.FC = () => {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className={`relative ${selectedId ? "hidden" : ""} w-full`}
+      className={`relative w-full`}
     >
       {renderCreateRoomButton()}
       {renderKPIs()}
