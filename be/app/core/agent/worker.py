@@ -59,7 +59,7 @@ async def entrypoint(ctx: agents.JobContext):
     logger.info(f"Using voice model: {voice_model}")
 
     from app.core.agent.graph import create_graph
-    llm_test = create_graph()
+    llm_test = create_graph(ctx.room)
     llm_test_adapter = LLMAdapter(llm_test)
 
     # Session: no LLM here
