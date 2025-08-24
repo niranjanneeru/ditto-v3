@@ -29,7 +29,7 @@ async def get_db_session() -> AsyncSession:
             await session.commit()
         except Exception as e:
             await session.rollback()
-            logger.error(f"Database session error: {e}")
+            logger.exception(f"Database session error: {e}")
             raise
         finally:
             await session.close()

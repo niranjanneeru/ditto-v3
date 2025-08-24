@@ -24,10 +24,15 @@ dependencies = [
     "livekit-plugins-langchain (>=1.2.6,<2.0.0)",
     "langgraph (>=0.2.0,<1.0.0)",
     "langchain-openai (>=0.2.0,<1.0.0)",
-    "siren-agent-toolkit (>=0.1.0,<0.2.0)",
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "pydantic[email] (>=2.11.7,<3.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "greenlet (>=3.2.4,<4.0.0)",
+    "siren-agent-toolkit (>=0.1.0,<0.2.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
