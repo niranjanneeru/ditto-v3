@@ -17,7 +17,7 @@ from . import contact_tools
 from . import job_tools
 
 # Import the base tool utilities
-from .base_langraph_lix_tool import lix_tool, make_lix_request, LixAPIConfig
+from .base_langraph_lix_tool import lix_tool, make_lix_request
 
 __all__ = [
     # Main registry and access functions
@@ -37,6 +37,5 @@ __all__ = [
     
     # Base utilities
     'lix_tool',
-    'make_lix_request',
-    'LixAPIConfig'
+    'make_lix_request'
 ]

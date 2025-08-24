@@ -1,35 +1,79 @@
 """LangGraph-compatible LinkedIn Post and Activity tools."""
 
 from typing import Dict, Any, Optional
-from app.core.graphs.tools.linkedin.base_langraph_lix_tool import lix_tool, make_lix_request
+from langchain_core.tools import tool
+from app.core.graphs.tools.linkedin.base_langraph_lix_tool import make_lix_request
 
 
-@lix_tool("enrich_post", "Enrich LinkedIn post data from post URL.")
+@tool
 def enrich_post(post_url: str) -> Dict[str, Any]:
-    """Enrich LinkedIn post data."""
+    """Enrich LinkedIn post data from post URL.
+    
+    Args:
+        post_url: LinkedIn post URL to get detailed post information
+        
+    Returns:
+        Dict containing enriched LinkedIn post data
+    """
+    if not post_url:
+        return {"error": "Post URL is required"}
+    
     params = {"post_url": post_url}
     return make_lix_request("post", params)
 
 
-@lix_tool("get_post_comments", "Retrieve comments for a LinkedIn post.")
+@tool
 def get_post_comments(post_url: str) -> Dict[str, Any]:
-    """Get comments for a LinkedIn post."""
+    """Retrieve comments for a LinkedIn post.
+    
+    Args:
+        post_url: LinkedIn post URL to get comments for
+        
+    Returns:
+        Dict containing post comments and engagement data
+    """
+    if not post_url:
+        return {"error": "Post URL is required"}
+    
     params = {"post_url": post_url}
     return make_lix_request("post/comments", params)
 
 
-@lix_tool("get_post_reactions", "Retrieve reactions for a LinkedIn post.")
+@tool
 def get_post_reactions(post_url: str, reaction_type: Optional[str] = None) -> Dict[str, Any]:
-    """Get reactions for a LinkedIn post."""
+    """Retrieve reactions for a LinkedIn post.
+    
+    Args:
+        post_url: LinkedIn post URL to get reactions for
+        reaction_type: Optional specific reaction type to filter by
+        
+    Returns:
+        Dict containing post reactions and engagement metrics
+    """
+    if not post_url:
+        return {"error": "Post URL is required"}
+    
     params = {"post_url": post_url}
     if reaction_type:
         params["reaction_type"] = reaction_type
     return make_lix_request("post/reactions", params)
 
 
-@lix_tool("get_user_posts", "Get the full activity posts of a LinkedIn user.")
+@tool
 def get_user_posts(profile_url: str, start: Optional[int] = None, count: Optional[int] = None) -> Dict[str, Any]:
-    """Get posts from LinkedIn user activity."""
+    """Get the full activity posts of a LinkedIn user.
+    
+    Args:
+        profile_url: LinkedIn profile URL to get posts for
+        start: Optional starting position for pagination
+        count: Optional number of posts to retrieve
+        
+    Returns:
+        Dict containing user's LinkedIn posts and activity
+    """
+    if not profile_url:
+        return {"error": "Profile URL is required"}
+    
     params = {"profile_url": profile_url}
     if start is not None:
         params["start"] = start
@@ -38,9 +82,21 @@ def get_user_posts(profile_url: str, start: Optional[int] = None, count: Optiona
     return make_lix_request("activity/posts", params)
 
 
-@lix_tool("get_user_comments", "Get the comments activity of a LinkedIn user.")
+@tool
 def get_user_comments(profile_url: str, start: Optional[int] = None, count: Optional[int] = None) -> Dict[str, Any]:
-    """Get comments from LinkedIn user activity."""
+    """Get the comments activity of a LinkedIn user.
+    
+    Args:
+        profile_url: LinkedIn profile URL to get comments for
+        start: Optional starting position for pagination
+        count: Optional number of comments to retrieve
+        
+    Returns:
+        Dict containing user's LinkedIn comments and activity
+    """
+    if not profile_url:
+        return {"error": "Profile URL is required"}
+    
     params = {"profile_url": profile_url}
     if start is not None:
         params["start"] = start

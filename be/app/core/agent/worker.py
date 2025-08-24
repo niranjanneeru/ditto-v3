@@ -1,11 +1,16 @@
 from livekit import agents
-from livekit.agents import AgentSession, Agent, RoomInputOptions, JobProcess
+from livekit.agents import (
+    AgentSession,
+    Agent,
+    RoomInputOptions,
+    JobProcess,
+)
 from livekit.plugins import (
-    openai,
     deepgram,
     noise_cancellation,
     silero,
 )
+from livekit.plugins.langchain import LLMAdapter
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from app.core.config import settings
@@ -31,8 +36,18 @@ DEFAULT_VOICE = "aura-2-atlas-en"
 
 
 class Assistant(Agent):
-    def __init__(self, instructions: str = COLD_OUTREACH_AGENT_PROMPT) -> None:
-        super().__init__(instructions=instructions)
+    def __init__(self, instructions: str = COLD_OUTREACH_AGENT_PROMPT, **kwargs) -> None:
+        # Pass llm in via kwargs if provided
+        super().__init__(instructions=instructions, **kwargs)
+
+    # If you ever want to override the node directly, uncomment and implement:
+    # async def llm_node(
+    #     self,
+    #     chat_ctx: ChatContext,
+    #     tools: list[FunctionTool],
+    #     model_settings: ModelSettings,
+    # ) -> AsyncIterable[ChatChunk]:
+    #     ...
 
 
 async def entrypoint(ctx: agents.JobContext):
@@ -40,27 +55,44 @@ async def entrypoint(ctx: agents.JobContext):
     
     # Use the cold outreach agent prompt
     selected_prompt = COLD_OUTREACH_AGENT_PROMPT
-    
-    # Use default voice model
     voice_model = DEFAULT_VOICE
     logger.info(f"Using voice model: {voice_model}")
 
+    from app.core.agent.graph import create_graph
+    llm_test = create_graph()
+    llm_test_adapter = LLMAdapter(llm_test)
+
+    # Session: no LLM here
     session = AgentSession(
-        stt=deepgram.STT(model="nova-3", language="multi", api_key=settings.DEEPGRAM_API_KEY),
-        llm=openai.LLM(model="gpt-4o-mini", api_key=settings.OPENAI_API_KEY),
-        tts=deepgram.TTS(model=voice_model, encoding="linear16", sample_rate=24000,
-                         api_key=settings.DEEPGRAM_API_KEY),
-        vad = (ctx.proc.userdata["vad"]),
+        stt=deepgram.STT(
+            model="nova-3",
+            language="multi",
+            api_key=settings.DEEPGRAM_API_KEY,
+        ),
+        tts=deepgram.TTS(
+            model=voice_model,
+            encoding="linear16",
+            sample_rate=24000,
+            api_key=settings.DEEPGRAM_API_KEY,
+        ),
+        vad=ctx.proc.userdata["vad"],
         turn_detection=MultilingualModel(),
     )
 
+    # Agent: give it the LLM adapter
+    agent = Assistant(instructions=selected_prompt, llm=llm_test_adapter)
+
+    # Optional sanity check (remove if noisy)
+    try:
+        inner = type(agent.llm._adapter).__name__  # noqa: SLF001
+        logger.debug(f"LLMAdapter inner: {inner}")  # Expect: LangChainAdapter
+    except Exception:
+        pass
+
     await session.start(
         room=ctx.room,
-        agent=Assistant(instructions=selected_prompt),
+        agent=agent,
         room_input_options=RoomInputOptions(
-            # LiveKit Cloud enhanced noise cancellation
-            # - If self-hosting, omit this parameter
-            # - For telephony applications, use `BVCTelephony` for best results
             noise_cancellation=noise_cancellation.BVC(),
         ),
     )

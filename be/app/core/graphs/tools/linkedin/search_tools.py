@@ -1,85 +1,118 @@
 """LangGraph-compatible LinkedIn Search tools."""
 
-from typing import Dict, Any, Optional
-from app.core.graphs.tools.linkedin.base_langraph_lix_tool import lix_tool, make_lix_request
+from typing import Dict, Any
+from urllib.parse import quote_plus
+from langchain_core.tools import tool
+from app.core.graphs.tools.linkedin.base_langraph_lix_tool import make_lix_request
 
 
-@lix_tool("search_people", "Search for people on LinkedIn using search URL or keywords.")
-def search_people(url: Optional[str] = None, keywords: Optional[str] = None) -> Dict[str, Any]:
-    """Search for people on LinkedIn."""
-    if not url and not keywords:
-        return {"error": "Either url or keywords must be provided"}
+@tool
+def search_people(query: str) -> Dict[str, Any]:
+    """Search for people on LinkedIn using keywords or search terms.
     
-    params = {}
-    if url:
-        params["url"] = url
-    else:
-        params["keywords"] = keywords
+    Args:
+        query: Search keywords or terms to find people on LinkedIn
+        
+    Returns:
+        Dict containing search results with people profiles
+    """
+    if not query:
+        return {"error": "Query parameter is required"}
     
-    return make_lix_request("li/linkedin/search/people", params)
+    params = {"url": f"https://www.linkedin.com/search/results/people/?keywords={quote_plus(query)}&origin=SWITCH_SEARCH_VERTICAL&sid=%40%2Co"}
+    response = make_lix_request("li/linkedin/search/people", params)
+    print('search_people', response)
+    return response
 
 
-@lix_tool("search_jobs", "Search for jobs on LinkedIn using search URL or keywords.")
-def search_jobs(url: Optional[str] = None, keywords: Optional[str] = None) -> Dict[str, Any]:
-    """Search for jobs on LinkedIn."""
-    if not url and not keywords:
-        return {"error": "Either url or keywords must be provided"}
+@tool
+def search_jobs(query: str) -> Dict[str, Any]:
+    """Search for jobs on LinkedIn using keywords or job titles.
     
-    params = {}
-    if url:
-        params["url"] = url
-    else:
-        params["keywords"] = keywords
+    Args:
+        query: Job search keywords, titles, or company names
+        
+    Returns:
+        Dict containing job search results
+    """
+    if not query:
+        return {"error": "Query parameter is required"}
     
+    params = {"keywords": query}
     return make_lix_request("li/linkedin/search/jobs", params)
 
 
-@lix_tool("search_companies", "Search for organizations/companies on LinkedIn using search URL or keywords.")
-def search_companies(url: Optional[str] = None, keywords: Optional[str] = None) -> Dict[str, Any]:
-    """Search for companies/organizations on LinkedIn."""
-    if not url and not keywords:
-        return {"error": "Either url or keywords must be provided"}
+@tool
+def search_companies(query: str) -> Dict[str, Any]:
+    """Search for companies on LinkedIn using company names or keywords.
     
-    params = {}
-    if url:
-        params["url"] = url
-    else:
-        params["keywords"] = keywords
+    Args:
+        query: Company name or industry keywords to search for
+        
+    Returns:
+        Dict containing company search results and information
+    """
+    if not query:
+        return {"error": "Query parameter is required"}
     
-    return make_lix_request("li/linkedin/search/organizations", params)
+    params = {"keywords": query}
+    return make_lix_request("li/linkedin/search/companies", params)
 
 
-@lix_tool("search_posts", "Search for posts on LinkedIn using search URL or keywords.")
-def search_posts(url: Optional[str] = None, keywords: Optional[str] = None) -> Dict[str, Any]:
-    """Search for posts on LinkedIn."""
-    if not url and not keywords:
-        return {"error": "Either url or keywords must be provided"}
+@tool
+def search_posts(query: str) -> Dict[str, Any]:
+    """Search for posts on LinkedIn using keywords or search terms.
     
-    params = {}
-    if url:
-        params["url"] = url
-    else:
-        params["keywords"] = keywords
+    Args:
+        query: Keywords or search terms to find LinkedIn posts
+        
+    Returns:
+        Dict containing post search results
+    """
+    if not query:
+        return {"error": "Query parameter is required"}
     
+    params = {"keywords": query}
     return make_lix_request("li/linkedin/search/posts", params)
 
 
-@lix_tool("search_sales_navigator_leads", "Search for leads using LinkedIn Sales Navigator search URL.")
+@tool
 def search_sales_navigator_leads(url: str) -> Dict[str, Any]:
-    """Search for leads using Sales Navigator."""
+    """Search for leads using LinkedIn Sales Navigator search URL.
+    
+    Args:
+        url: Sales Navigator search URL for leads
+        
+    Returns:
+        Dict containing lead search results from Sales Navigator
+    """
     params = {"url": url}
     return make_lix_request("li/linkedin/search/sales-navigator/leads", params)
 
 
-@lix_tool("search_sales_navigator_accounts", "Search for accounts using LinkedIn Sales Navigator search URL.")
+@tool
 def search_sales_navigator_accounts(url: str) -> Dict[str, Any]:
-    """Search for accounts using Sales Navigator."""
+    """Search for accounts using LinkedIn Sales Navigator search URL.
+    
+    Args:
+        url: Sales Navigator search URL for accounts
+        
+    Returns:
+        Dict containing account search results from Sales Navigator
+    """
     params = {"url": url}
     return make_lix_request("li/linkedin/search/sales-navigator/accounts", params)
 
 
-@lix_tool("search_recruiter_candidates", "Search for candidates using LinkedIn Recruiter search URL.")
+@tool
 def search_recruiter_candidates(url: str) -> Dict[str, Any]:
-    """Search for candidates using LinkedIn Recruiter."""
+    """Search for candidates using LinkedIn Recruiter search URL.
+    
+    Args:
+        url: LinkedIn Recruiter search URL for candidates
+        
+    Returns:
+        Dict containing candidate search results from Recruiter
+    """
     params = {"url": url}
     return make_lix_request("li/linkedin/search/recruiter/candidates", params)
