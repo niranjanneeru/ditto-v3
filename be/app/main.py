@@ -29,8 +29,8 @@ async def lifespan(_: FastAPI):
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Reach AI",
-    description="BE Service for Reach AI",
+    title="Synapse AI",
+    description="BE Service for Synapse AI",
     version="1.0.0",
     lifespan=lifespan,
     middleware=get_middlewares(),

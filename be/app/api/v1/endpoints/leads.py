@@ -221,3 +221,138 @@ async def sms(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"SMS broadcast failed: {str(e)}")
+
+
+@router.post("/linkedin-product-updates", status_code=status.HTTP_200_OK)
+async def linkedin_product_updates(
+    product_info: dict,
+    db: AsyncSession = Depends(get_db_session),
+):
+    """Crawl all leads' LinkedIn profiles, analyze their posts, and send personalized product updates."""
+    try:
+        from sqlalchemy import select
+        result = await db.execute(
+            select(Lead.name, Lead.email).where(Lead.email.isnot(None))
+        )
+        leads = result.fetchall()
+        
+        if not leads:
+            raise HTTPException(status_code=404, detail="No leads found")
+            
+        from app.core.config import settings
+        from langchain_openai import ChatOpenAI
+        from langchain.agents import AgentExecutor, create_tool_calling_agent
+        from langchain_core.prompts import ChatPromptTemplate
+        from app.core.graphs.tools.linkedin.tool_registry import get_linkedin_tools
+        from agenttoolkit.langchain import SirenAgentToolkit
+        
+        # Set up LLM
+        llm = ChatOpenAI(
+            model="gpt-4o-mini",
+            temperature=0.7,
+            api_key=settings.OPENAI_API_KEY
+        )
+        
+        # Get LinkedIn tools for profile/post analysis
+        linkedin_tools = get_linkedin_tools()
+        
+        # Set up Siren toolkit for sending updates
+        siren_toolkit = SirenAgentToolkit(
+            api_key=settings.SIREN_API_KEY,
+            configuration={
+                "actions": {
+                    "messaging": {"create": True, "read": True},
+                    "templates": {"read": True, "create": True, "update": True, "delete": True},
+                    "users": {"create": True, "update": True, "delete": True, "read": True},
+                    "workflows": {"trigger": True, "schedule": True},
+                },
+            },
+        )
+        
+        # Combine LinkedIn and Siren tools
+        all_tools = linkedin_tools + siren_toolkit.get_tools()
+        
+        # Create comprehensive prompt
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", f"""You are an AI assistant that can analyze LinkedIn profiles and send personalized product updates.
+            
+            TASK: For each lead, you should:
+            1. Search for their LinkedIn profile using their name and email
+            2. Get their recent posts and activities
+            3. Analyze their interests and professional focus
+            4. Create a personalized email about our new product that resonates with their interests
+            5. Send the email via Siren API
+            
+            PRODUCT INFO: {product_info}
+            
+            For email sending, use:
+            - channel: "EMAIL"
+            - recipient_value: the email address
+            - subject: personalized subject line
+            - body: personalized product update message
+            
+            Make each message highly relevant to their LinkedIn activity and interests."""),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ])
+        
+        # Create agent
+        agent = create_tool_calling_agent(llm, all_tools, prompt)
+        agent_executor = AgentExecutor(agent=agent, tools=all_tools, verbose=True)
+        
+        processed_count = 0
+        sent_count = 0
+        failed_count = 0
+        results = []
+        
+        # Process each lead
+        for name, email in leads:
+            try:
+                processed_count += 1
+                
+                agent_input = f"""
+                Process lead: {name} (Email: {email})
+                
+                Steps:
+                1. Search LinkedIn for "{name}" using their email domain for context
+                2. Get their profile information and recent posts/activities
+                3. Analyze their professional interests and recent engagement
+                4. Create a personalized email about our product that connects with their interests
+                5. Send the personalized email to {email}
+                
+                Focus on making the product update relevant to their LinkedIn activity.
+                """
+                
+                result = agent_executor.invoke({"input": agent_input})
+                
+                sent_count += 1
+                results.append({
+                    "name": name,
+                    "email": email,
+                    "status": "processed",
+                    "agent_response": result.get("output", "LinkedIn analysis and email sent successfully")
+                })
+                
+            except Exception as e:
+                failed_count += 1
+                results.append({
+                    "name": name,
+                    "email": email,
+                    "status": "failed",
+                    "error": str(e)
+                })
+        
+        return {
+            "total_leads": len(leads),
+            "processed_count": processed_count,
+            "sent_count": sent_count,
+            "failed_count": failed_count,
+            "product_info": product_info,
+            "results": results,
+            "message": f"LinkedIn product updates completed: {sent_count} sent, {failed_count} failed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LinkedIn product updates failed: {str(e)}")
