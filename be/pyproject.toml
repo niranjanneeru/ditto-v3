@@ -23,7 +23,8 @@ dependencies = [
     "livekit-plugins-turn-detector (>=1.2.6,<2.0.0)",
     "livekit-plugins-langchain (>=1.2.6,<2.0.0)",
     "langgraph (>=0.2.0,<1.0.0)",
-    "langchain-openai (>=0.2.0,<1.0.0)"
+    "langchain-openai (>=0.2.0,<1.0.0)",
+    "siren-agent-toolkit (==0.1.0)"
 ]
 
 

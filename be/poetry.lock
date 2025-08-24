@@ -550,6 +550,27 @@ files = [
 ]
 
 [[package]]
+name = "dnspython"
+version = "2.7.0"
+description = "DNS toolkit"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "dnspython-2.7.0-py3-none-any.whl", hash = "sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86"},
+    {file = "dnspython-2.7.0.tar.gz", hash = "sha256:ce9c432eda0dc91cf618a5cedf1a4e142651196bbcd2c80e89ed5a907e5cfaf1"},
+]
+
+[package.extras]
+dev = ["black (>=23.1.0)", "coverage (>=7.0)", "flake8 (>=7)", "hypercorn (>=0.16.0)", "mypy (>=1.8)", "pylint (>=3)", "pytest (>=7.4)", "pytest-cov (>=4.1.0)", "quart-trio (>=0.11.0)", "sphinx (>=7.2.0)", "sphinx-rtd-theme (>=2.0.0)", "twine (>=4.0.0)", "wheel (>=0.42.0)"]
+dnssec = ["cryptography (>=43)"]
+doh = ["h2 (>=4.1.0)", "httpcore (>=1.0.0)", "httpx (>=0.26.0)"]
+doq = ["aioquic (>=1.0.0)"]
+idna = ["idna (>=3.7)"]
+trio = ["trio (>=0.23)"]
+wmi = ["wmi (>=1.5.1)"]
+
+[[package]]
 name = "docstring-parser"
 version = "0.17.0"
 description = "Parse Python docstrings in reST, Google and Numpydoc format"
@@ -565,6 +586,22 @@ files = [
 dev = ["pre-commit (>=2.16.0) ; python_version >= \"3.9\"", "pydoctor (>=25.4.0)", "pytest"]
 docs = ["pydoctor (>=25.4.0)"]
 test = ["pytest"]
+
+[[package]]
+name = "email-validator"
+version = "2.2.0"
+description = "A robust email address syntax and deliverability validation library."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "email_validator-2.2.0-py3-none-any.whl", hash = "sha256:561977c2d73ce3611850a06fa56b414621e0c8faa9d66f2611407d87465da631"},
+    {file = "email_validator-2.2.0.tar.gz", hash = "sha256:cb690f344c617a714f22e66ae771445a1ceb46821152df8e165c5f9a364582b7"},
+]
+
+[package.dependencies]
+dnspython = ">=2.0.0"
+idna = ">=2.0.0"
 
 [[package]]
 name = "eval-type-backport"
@@ -2635,6 +2672,7 @@ files = [
 
 [package.dependencies]
 annotated-types = ">=0.6.0"
+email-validator = {version = ">=2.0.0", optional = true, markers = "extra == \"email\""}
 pydantic-core = "2.33.2"
 typing-extensions = ">=4.12.2"
 typing-inspection = ">=0.4.0"
@@ -3065,6 +3103,29 @@ testingfree = ["huggingface-hub (>=0.12.1)", "hypothesis (>=6.70.2)", "pytest (>
 torch = ["safetensors[numpy]", "torch (>=1.10)"]
 
 [[package]]
+name = "siren-agent-toolkit"
+version = "0.1.0"
+description = "Agent toolkit for Siren notification platform"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "siren_agent_toolkit-0.1.0-py3-none-any.whl", hash = "sha256:3d31f3b4b695a489d94cb76146719d3e10b07107f513c3c442e496a2fa4c8427"},
+    {file = "siren_agent_toolkit-0.1.0.tar.gz", hash = "sha256:04d751b8fca40b4661b33d8362c352d2f764c5b5ab721e6a923329699f64110c"},
+]
+
+[package.dependencies]
+pydantic = ">=2.0.0"
+trysiren = ">=0.1.1"
+
+[package.extras]
+all = ["crewai (>=0.1.0)", "crewai-tools (>=0.1.0)", "langchain (>=0.1.0)", "langchain-core (>=0.1.0)", "openai (>=1.0.0)"]
+crewai = ["crewai (>=0.1.0)", "crewai-tools (>=0.1.0)"]
+dev = ["black (>=23.0.0)", "flake8 (>=6.0.0)", "isort (>=5.12.0)", "mypy (>=1.0.0)", "pytest (>=7.0.0)", "pytest-asyncio (>=0.21.0)", "python-dotenv (>=1.0.0)"]
+langchain = ["langchain (>=0.1.0)", "langchain-core (>=0.1.0)"]
+openai = ["openai (>=1.0.0)"]
+
+[[package]]
 name = "sniffio"
 version = "1.3.1"
 description = "Sniff out which async library your code is running under"
@@ -3422,6 +3483,26 @@ torch-vision = ["Pillow (>=10.0.1,<=15.0)", "torchvision"]
 torchhub = ["filelock", "huggingface-hub (>=0.34.0,<1.0)", "importlib_metadata", "numpy (>=1.17)", "packaging (>=20.0)", "protobuf", "regex (!=2019.12.17)", "requests", "sentencepiece (>=0.1.91,!=0.1.92)", "tokenizers (>=0.21,<0.22)", "torch (>=2.1)", "tqdm (>=4.27)"]
 video = ["av"]
 vision = ["Pillow (>=10.0.1,<=15.0)"]
+
+[[package]]
+name = "trysiren"
+version = "0.1.1"
+description = "Python SDK for the Siren Notification Platform."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "trysiren-0.1.1-py3-none-any.whl", hash = "sha256:817e7e2e6b7fedee449069c0548bc05a7088cccfc92e30c9fa22b65a8d244e10"},
+    {file = "trysiren-0.1.1.tar.gz", hash = "sha256:8c60856176ad170acbf70c671d8c4ec7a7da96d6118f204689f643fa1cb31552"},
+]
+
+[package.dependencies]
+httpx = ">=0.26.0"
+pydantic = {version = ">=2.0,<3.0", extras = ["email"]}
+requests = ">=2.25.0"
+
+[package.extras]
+dev = ["build (>=0.10.0)", "pre-commit", "pyright", "pytest (>=7.0)", "pytest-asyncio (>=0.20)", "pytest-cov", "pytest-mock", "python-dotenv", "requests-mock", "respx (>=0.21.0,<0.23)", "ruff", "twine (>=3.8.0)", "uv"]
 
 [[package]]
 name = "types-protobuf"
@@ -4084,4 +4165,4 @@ cffi = ["cffi (>=1.17) ; python_version >= \"3.13\" and platform_python_implemen
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "19b9528aa25c0b4a26b97a463f54b6bca553b2b6f470fcdc530fb9c97f03c50d"
+content-hash = "ed2cc3205469a43594015a016ec0a59c0430c1d1f5a4304198ee4f76985625b2"
