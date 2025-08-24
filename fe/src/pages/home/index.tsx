@@ -22,7 +22,7 @@ import { Header, SimulationLoader } from "@components";
 import { homePageContainerVariants, homePageItemVariants } from "@constants";
 import { createRoom } from "@api";
 import { logo } from "@assets";
-import { LineChart } from '@mui/x-charts/LineChart';
+import { LineChart } from "@mui/x-charts/LineChart";
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -469,44 +469,62 @@ export const Home: React.FC = () => {
               <div className="text-sm text-gray-500">Last 30 days</div>
             </div>
 
-          {/* MUI Line Chart */}
-          <div className="relative z-10 h-64">
-            <LineChart
-              xAxis={[{ 
-                data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
-                label: 'Days',
-                tickLabelStyle: { fontSize: '10px', fill: '#6B7280' }
-              }]}
-              yAxis={[{ 
-                label: 'Percentage',
-                tickLabelStyle: { fontSize: '10px', fill: '#6B7280' }
-              }]}
-              series={[
-                {
-                  data: [65, 72, 68, 75, 82, 78, 85, 90, 87, 92, 88, 95, 91, 89, 93, 96, 94, 97, 99, 98, 100, 97, 95, 98, 96, 99, 97, 100, 98, 99],
-                  label: 'Leads Generated',
-                  color: '#374151',
-                  curve: 'monotoneX'
-                },
-                {
-                  data: [45, 52, 48, 55, 62, 58, 65, 70, 67, 72, 68, 75, 71, 69, 73, 76, 74, 77, 79, 78, 80, 77, 75, 78, 76, 79, 77, 80, 78, 79],
-                  label: 'Response Rate',
-                  color: '#6B7280',
-                  curve: 'monotoneX'
-                },
-                {
-                  data: [25, 32, 28, 35, 42, 38, 45, 50, 47, 52, 48, 55, 51, 49, 53, 56, 54, 57, 59, 58, 60, 57, 55, 58, 56, 59, 57, 60, 58, 59],
-                  label: 'Deals Closed',
-                  color: '#9CA3AF',
-                  curve: 'monotoneX'
-                }
-              ]}
-              height={250}
-              margin={{ left: 60, right: 30, top: 20, bottom: 30 }}
-              grid={{ vertical: true, horizontal: true }}
-
-            />
-          </div>
+            {/* MUI Line Chart */}
+            <div className="relative z-10 h-64">
+              <LineChart
+                xAxis={[
+                  {
+                    data: [
+                      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                      18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                    ],
+                    label: "Days",
+                    tickLabelStyle: { fontSize: "10px", fill: "#6B7280" },
+                  },
+                ]}
+                yAxis={[
+                  {
+                    label: "Percentage",
+                    tickLabelStyle: { fontSize: "10px", fill: "#6B7280" },
+                  },
+                ]}
+                series={[
+                  {
+                    data: [
+                      65, 72, 68, 75, 82, 78, 85, 90, 87, 92, 88, 95, 91, 89,
+                      93, 96, 94, 97, 99, 98, 100, 97, 95, 98, 96, 99, 97, 100,
+                      98, 99,
+                    ],
+                    label: "Leads Generated",
+                    color: "#374151",
+                    curve: "monotoneX",
+                  },
+                  {
+                    data: [
+                      45, 52, 48, 55, 62, 58, 65, 70, 67, 72, 68, 75, 71, 69,
+                      73, 76, 74, 77, 79, 78, 80, 77, 75, 78, 76, 79, 77, 80,
+                      78, 79,
+                    ],
+                    label: "Response Rate",
+                    color: "#6B7280",
+                    curve: "monotoneX",
+                  },
+                  {
+                    data: [
+                      25, 32, 28, 35, 42, 38, 45, 50, 47, 52, 48, 55, 51, 49,
+                      53, 56, 54, 57, 59, 58, 60, 57, 55, 58, 56, 59, 57, 60,
+                      58, 59,
+                    ],
+                    label: "Deals Closed",
+                    color: "#9CA3AF",
+                    curve: "monotoneX",
+                  },
+                ]}
+                height={250}
+                margin={{ left: 60, right: 30, top: 20, bottom: 30 }}
+                grid={{ vertical: true, horizontal: true }}
+              />
+            </div>
           </div>
 
           {/* Animated background elements */}

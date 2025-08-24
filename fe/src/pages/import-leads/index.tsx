@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, FileText, MessageSquare, ArrowLeft, CheckCircle } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  MessageSquare,
+  ArrowLeft,
+  CheckCircle,
+} from "lucide-react";
+import * as XLSX from "xlsx";
 
 import { Header } from "@components";
 import { APP_ROUTES } from "@constants";
@@ -12,7 +19,7 @@ interface LeadData {
 }
 
 interface UploadStep {
-  csvFile: File | null;
+  xlsxFile: File | null;
   leads: LeadData[];
 }
 
@@ -26,43 +33,108 @@ type Step = "upload" | "message" | "confirmation";
 export const ImportLeads: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>("upload");
-  const [uploadStep, setUploadStep] = useState<UploadStep>({ csvFile: null, leads: [] });
-  const [messageStep, setMessageStep] = useState<MessageStep>({ message: "", channel: "whatsapp" });
+  const [uploadStep, setUploadStep] = useState<UploadStep>({
+    xlsxFile: null,
+    leads: [],
+  });
+  const [messageStep, setMessageStep] = useState<MessageStep>({
+    message: "",
+    channel: "whatsapp",
+  });
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type === "text/csv") {
-      setUploadStep(prev => ({ ...prev, csvFile: file }));
+  // Function to test API endpoints when channel is selected
+  const testChannelEndpoint = async (channel: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/leads/${channel}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+          body: JSON.stringify({
+            content: "",
+          }),
+        },
+      );
+
+      if (response.ok) {
+        console.log(`✅ ${channel.toUpperCase()} endpoint test successful`);
+      } else {
+        console.log(
+          `❌ ${channel.toUpperCase()} endpoint test failed: ${response.status}`,
+        );
+      }
+    } catch (error) {
+      console.error(`Error testing ${channel} endpoint:`, error);
     }
   };
 
-  const processCSV = async () => {
-    if (!uploadStep.csvFile) return;
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (
+      file &&
+      (file.type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.name.endsWith(".xlsx"))
+    ) {
+      setUploadStep((prev) => ({ ...prev, xlsxFile: file }));
+    }
+  };
+
+  const processXLSX = async () => {
+    if (!uploadStep.xlsxFile) return;
 
     setIsProcessing(true);
-    
-    try {
-      const text = await uploadStep.csvFile.text();
-      const lines = text.split('\n');
-      // const headers = lines[0].split(',').map(h => h.trim());
-      
-      const leads: LeadData[] = lines.slice(1)
-        .filter(line => line.trim())
-        .map(line => {
-          const values = line.split(',').map(v => v.trim());
-          return {
-            name: values[0] || '',
-            email: values[1] || '',
-            phone: values[2] || ''
-          };
-        })
-        .filter(lead => lead.name && lead.email);
 
-      setUploadStep(prev => ({ ...prev, leads }));
+    try {
+      // Create FormData for multipart/form-data
+      const formData = new FormData();
+      formData.append("file", uploadStep.xlsxFile);
+
+      // Make API call to bulk-insert endpoint
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/leads/bulk-insert`,
+        {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+          },
+          body: formData,
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Bulk insert result:", result);
+
+      // Process the XLSX file locally for preview
+      const arrayBuffer = await uploadStep.xlsxFile.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      const leads: LeadData[] = jsonData
+        .slice(1) // Skip header row
+        .filter((row: any) => row && row.length >= 2)
+        .map((row: any) => ({
+          name: String(row[0] || "").trim(),
+          email: String(row[1] || "").trim(),
+          phone: row[2] ? String(row[2]).trim() : "",
+        }))
+        .filter((lead) => lead.name && lead.email);
+
+      setUploadStep((prev) => ({ ...prev, leads }));
       setCurrentStep("message");
     } catch (error) {
-      console.error('Error processing CSV:', error);
+      console.error("Error processing CSV:", error);
+      // You might want to show an error message to the user here
     } finally {
       setIsProcessing(false);
     }
@@ -70,13 +142,51 @@ export const ImportLeads: React.FC = () => {
 
   const handleSubmit = async () => {
     setIsProcessing(true);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Determine the correct API endpoint based on the selected channel
+      let endpoint = "";
+      switch (messageStep.channel) {
+        case "sms":
+          endpoint = "sms";
+          break;
+        case "whatsapp":
+          endpoint = "whatsapp";
+          break;
+        case "email":
+          endpoint = "email";
+          break;
+        default:
+          endpoint = "sms";
+      }
+
+      // Make API call to the specific channel endpoint
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/leads/${endpoint}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+          body: JSON.stringify({
+            content: messageStep.message,
+            leads: uploadStep.leads,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log(`Send ${messageStep.channel} messages result:`, result);
+
       setCurrentStep("confirmation");
     } catch (error) {
-      console.error('Error sending messages:', error);
+      console.error("Error sending messages:", error);
+      // You might want to show an error message to the user here
     } finally {
       setIsProcessing(false);
     }
@@ -88,48 +198,58 @@ export const ImportLeads: React.FC = () => {
         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Upload className="w-10 h-10 text-gray-600" />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Import Leads</h2>
-        <p className="text-gray-600">Upload a CSV file containing your leads information</p>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          Import Leads
+        </h2>
+        <p className="text-gray-600">
+          Upload a XLSX file containing your leads information
+        </p>
       </div>
 
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 mb-6 hover:border-gray-400 transition-colors">
         <input
           type="file"
-          accept=".csv"
+          accept=".xlsx"
           onChange={handleFileUpload}
           className="hidden"
-          id="csv-upload"
+          id="xlsx-upload"
         />
         <label
-          htmlFor="csv-upload"
+          htmlFor="xlsx-upload"
           className="cursor-pointer flex flex-col items-center"
         >
           <FileText className="w-12 h-12 text-gray-400 mb-4" />
           <span className="text-gray-600 mb-2">
-            {uploadStep.csvFile ? uploadStep.csvFile.name : "Click to select CSV file"}
+            {uploadStep.xlsxFile
+              ? uploadStep.xlsxFile.name
+              : "Click to select XLSX file"}
           </span>
           <span className="text-sm text-gray-500">
-            {uploadStep.csvFile ? "File selected" : "or drag and drop"}
+            {uploadStep.xlsxFile ? "File selected" : "or drag and drop"}
           </span>
         </label>
       </div>
 
-      {uploadStep.csvFile && (
+      {uploadStep.xlsxFile && (
         <div className="mb-6">
           <div className="bg-gray-50 rounded-lg p-4 text-left">
             <h3 className="font-medium text-gray-900 mb-2">File Details:</h3>
-            <p className="text-sm text-gray-600">Name: {uploadStep.csvFile.name}</p>
-            <p className="text-sm text-gray-600">Size: {(uploadStep.csvFile.size / 1024).toFixed(1)} KB</p>
+            <p className="text-sm text-gray-600">
+              Name: {uploadStep.xlsxFile.name}
+            </p>
+            <p className="text-sm text-gray-600">
+              Size: {(uploadStep.xlsxFile.size / 1024).toFixed(1)} KB
+            </p>
           </div>
         </div>
       )}
 
       <button
-        onClick={processCSV}
-        disabled={!uploadStep.csvFile || isProcessing}
+        onClick={processXLSX}
+        disabled={!uploadStep.xlsxFile || isProcessing}
         className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
       >
-        {isProcessing ? "Processing..." : "Process CSV"}
+        {isProcessing ? "Processing..." : "Process XLSX"}
       </button>
     </div>
   );
@@ -140,7 +260,9 @@ export const ImportLeads: React.FC = () => {
         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <MessageSquare className="w-10 h-10 text-gray-600" />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Compose Message</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          Compose Message
+        </h2>
         <p className="text-gray-600">
           {uploadStep.leads.length} leads will receive your message
         </p>
@@ -153,7 +275,9 @@ export const ImportLeads: React.FC = () => {
           </label>
           <textarea
             value={messageStep.message}
-            onChange={(e) => setMessageStep(prev => ({ ...prev, message: e.target.value }))}
+            onChange={(e) =>
+              setMessageStep((prev) => ({ ...prev, message: e.target.value }))
+            }
             placeholder="Enter your message here..."
             rows={6}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent resize-none"
@@ -168,11 +292,18 @@ export const ImportLeads: React.FC = () => {
             {[
               { value: "whatsapp", label: "WhatsApp", icon: "💬" },
               { value: "email", label: "Email", icon: "📧" },
-              { value: "sms", label: "SMS", icon: "📱" }
+              { value: "sms", label: "SMS", icon: "📱" },
             ].map((channel) => (
               <button
                 key={channel.value}
-                onClick={() => setMessageStep(prev => ({ ...prev, channel: channel.value as any }))}
+                onClick={() => {
+                  setMessageStep((prev) => ({
+                    ...prev,
+                    channel: channel.value as any,
+                  }));
+                  // Test the API endpoint when channel is selected
+                  testChannelEndpoint(channel.value);
+                }}
                 className={`p-4 border-2 rounded-lg text-center transition-colors ${
                   messageStep.channel === channel.value
                     ? "border-black bg-black text-white"
@@ -211,9 +342,12 @@ export const ImportLeads: React.FC = () => {
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <CheckCircle className="w-10 h-10 text-green-600" />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sent Successfully</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          Sent Successfully
+        </h2>
         <p className="text-gray-600">
-          Your message has been sent to {uploadStep.leads.length} leads via {messageStep.channel}
+          Your message has been sent to {uploadStep.leads.length} leads via{" "}
+          {messageStep.channel}
         </p>
       </div>
 
@@ -242,7 +376,7 @@ export const ImportLeads: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       <div className="pt-20 pb-8 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
@@ -262,4 +396,4 @@ export const ImportLeads: React.FC = () => {
       </div>
     </div>
   );
-}; 
+};

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Track } from "livekit-client";
 import { useLocalParticipant } from "@livekit/components-react";
 
-
 import { useAudioLevel } from "@hooks";
 import type { AudioTrackRef } from "@types";
 
@@ -57,13 +56,14 @@ const HorizontalWaveVisualizerInner: React.FC<{ trackRef: AudioTrackRef }> = ({
         const randomFactor = Math.random() * 0.4 + 0.6;
 
         // Calculate extension above/below center line
-        const extension = MAX_EXTENSION * wavePattern * audioFactor * randomFactor;
-        
+        const extension =
+          MAX_EXTENSION * wavePattern * audioFactor * randomFactor;
+
         // Return both top and bottom heights for organic wave
         return {
           top: Math.max(0, extension),
           bottom: Math.max(0, extension),
-          center: BASE_HEIGHT
+          center: BASE_HEIGHT,
         };
       });
       setBarHeights(newBars);
